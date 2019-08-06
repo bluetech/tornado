@@ -19,7 +19,6 @@ This module also defines the `HTTPServerRequest` class which is exposed
 via `tornado.web.RequestHandler.request`.
 """
 
-import calendar
 import collections
 import copy
 import datetime
@@ -845,6 +844,24 @@ def parse_multipart_form_data(
             arguments.setdefault(name, []).append(value)
 
 
+_day_name = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+_month_name = (
+    None,
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+)
+
+
 def format_timestamp(
     ts: Union[int, float, tuple, time.struct_time, datetime.datetime]
 ) -> str:
@@ -858,14 +875,24 @@ def format_timestamp(
     'Sun, 27 Jan 2013 18:43:20 GMT'
     """
     if isinstance(ts, (int, float)):
-        time_num = ts
+        time_tuple = time.gmtime(ts)
     elif isinstance(ts, (tuple, time.struct_time)):
-        time_num = calendar.timegm(ts)
+        time_tuple = ts  # type: ignore
     elif isinstance(ts, datetime.datetime):
-        time_num = calendar.timegm(ts.utctimetuple())
+        time_tuple = ts.utctimetuple()
     else:
         raise TypeError("unknown timestamp type: %r" % ts)
-    return email.utils.formatdate(time_num, usegmt=True)
+
+    year, month, day, hour, minute, second, weekday, _, _ = time_tuple  # type: ignore
+    return "%s, %02d %s %04d %02d:%02d:%02d GMT" % (
+        _day_name[weekday],
+        day,
+        _month_name[month],
+        year,
+        hour,
+        minute,
+        second,
+    )
 
 
 RequestStartLine = collections.namedtuple(
