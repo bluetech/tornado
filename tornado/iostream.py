@@ -835,26 +835,24 @@ class BaseIOStream(object):
         error closes the socket and raises an exception.
         """
         try:
-            while True:
-                try:
-                    if self._user_read_buffer:
-                        buf = memoryview(self._read_buffer)[
-                            self._read_buffer_size :
-                        ]  # type: Union[memoryview, bytearray]
-                    else:
-                        buf = bytearray(self.read_chunk_size)
-                    bytes_read = self.read_from_fd(buf)
-                except (socket.error, IOError, OSError) as e:
-                    # ssl.SSLError is a subclass of socket.error
-                    if self._is_connreset(e):
-                        # Treat ECONNRESET as a connection close rather than
-                        # an error to minimize log spam  (the exception will
-                        # be available on self.error for apps that care).
-                        self.close(exc_info=e)
-                        return None
+            try:
+                if self._user_read_buffer:
+                    buf = memoryview(self._read_buffer)[
+                        self._read_buffer_size :
+                    ]  # type: Union[memoryview, bytearray]
+                else:
+                    buf = bytearray(self.read_chunk_size)
+                bytes_read = self.read_from_fd(buf)
+            except (socket.error, IOError, OSError) as e:
+                # ssl.SSLError is a subclass of socket.error
+                if self._is_connreset(e):
+                    # Treat ECONNRESET as a connection close rather than
+                    # an error to minimize log spam  (the exception will
+                    # be available on self.error for apps that care).
                     self.close(exc_info=e)
-                    raise
-                break
+                    return None
+                self.close(exc_info=e)
+                raise
             if bytes_read is None:
                 return 0
             elif bytes_read == 0:
