@@ -19,7 +19,6 @@ import signal
 import unittest
 import warnings
 
-from tornado.escape import utf8
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 from tornado.httpserver import HTTPServer
@@ -126,7 +125,7 @@ class CompatibilityTests(unittest.TestCase):
         # http://twistedmatrix.com/documents/current/web/howto/client.html
         chunks = []
         client = Agent(self.reactor)
-        d = client.request(b"GET", utf8(url))
+        d = client.request(b"GET", url.encode())
 
         class Accumulator(Protocol):
             def __init__(self, finished):
@@ -171,7 +170,7 @@ class CompatibilityTests(unittest.TestCase):
             # by reading the body in one blob instead of streaming it with
             # a Protocol.
             client = Agent(self.reactor)
-            response = yield client.request(b"GET", utf8(url))
+            response = yield client.request(b"GET", url.encode())
             with warnings.catch_warnings():
                 # readBody has a buggy DeprecationWarning in Twisted 15.0:
                 # https://twistedmatrix.com/trac/changeset/43379

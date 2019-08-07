@@ -255,14 +255,14 @@ class EscapeTestCase(unittest.TestCase):
         tests = [
             ("%C3%A9", u"\u00e9", "utf8"),
             ("%C3%A9", u"\u00c3\u00a9", "latin1"),
-            ("%C3%A9", utf8(u"\u00e9"), None),
+            ("%C3%A9", u"\u00e9".encode(), None),
         ]
         for escaped, unescaped, encoding in tests:
             # input strings to url_unescape should only contain ascii
             # characters, but make sure the function accepts both byte
             # and unicode strings.
             self.assertEqual(url_unescape(escaped, encoding), unescaped)
-            self.assertEqual(url_unescape(utf8(escaped), encoding), unescaped)
+            self.assertEqual(url_unescape(escaped.encode(), encoding), unescaped)
 
     def test_url_escape_quote_plus(self):
         unescaped = "+ #%"
@@ -272,9 +272,9 @@ class EscapeTestCase(unittest.TestCase):
         self.assertEqual(url_escape(unescaped, plus=False), escaped)
         self.assertEqual(url_unescape(plus_escaped), unescaped)
         self.assertEqual(url_unescape(escaped, plus=False), unescaped)
-        self.assertEqual(url_unescape(plus_escaped, encoding=None), utf8(unescaped))
+        self.assertEqual(url_unescape(plus_escaped, encoding=None), unescaped.encode())
         self.assertEqual(
-            url_unescape(escaped, encoding=None, plus=False), utf8(unescaped)
+            url_unescape(escaped, encoding=None, plus=False), unescaped.encode()
         )
 
     def test_escape_return_types(self):
@@ -290,16 +290,10 @@ class EscapeTestCase(unittest.TestCase):
         self.assertEqual(json_decode(u'"foo"'), u"foo")
 
         # Non-ascii bytes are interpreted as utf8
-        self.assertEqual(json_decode(utf8(u'"\u00e9"')), u"\u00e9")
+        self.assertEqual(json_decode('"\u00e9"'.encode()), u"\u00e9")
 
     def test_json_encode(self):
-        # json deals with strings, not bytes.  On python 2 byte strings will
-        # convert automatically if they are utf8; on python 3 byte strings
-        # are not allowed.
         self.assertEqual(json_decode(json_encode(u"\u00e9")), u"\u00e9")
-        if bytes is str:
-            self.assertEqual(json_decode(json_encode(utf8(u"\u00e9"))), u"\u00e9")
-            self.assertRaises(UnicodeDecodeError, json_encode, b"\xe9")
 
     def test_squeeze(self):
         self.assertEqual(

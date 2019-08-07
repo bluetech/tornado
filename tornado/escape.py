@@ -98,7 +98,7 @@ def url_escape(value: Union[str, bytes], plus: bool = True) -> str:
         The ``plus`` argument
     """
     quote = urllib.parse.quote_plus if plus else urllib.parse.quote
-    return quote(utf8(value))
+    return quote(value)
 
 
 @typing.overload

@@ -5,7 +5,6 @@ import tempfile
 import unittest
 
 import tornado.locale
-from tornado.escape import utf8
 
 
 class TranslationLoaderTest(unittest.TestCase):
@@ -81,7 +80,7 @@ class LocaleDataTest(unittest.TestCase):
         name = tornado.locale.LOCALE_NAMES["es_LA"]["name"]
         self.assertTrue(isinstance(name, str))
         self.assertEqual(name, u"Espa\u00f1ol")
-        self.assertEqual(utf8(name), b"Espa\xc3\xb1ol")
+        self.assertEqual(name.encode(), b"Espa\xc3\xb1ol")
 
 
 class EnglishTest(unittest.TestCase):

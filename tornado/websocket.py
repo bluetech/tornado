@@ -1270,7 +1270,7 @@ class WebSocketProtocol13(WebSocketProtocol):
                 else:
                     close_data = struct.pack(">H", code)
                 if reason is not None:
-                    close_data += utf8(reason)
+                    close_data += reason.encode()
                 try:
                     self._write_frame(True, 0x8, close_data)
                 except StreamClosedError:
@@ -1551,7 +1551,6 @@ class WebSocketClientConnection(simple_httpclient._HTTPConnection):
         .. versionadded:: 5.1
 
         """
-        data = utf8(data)
         if self.protocol is None:
             raise WebSocketClosedError()
         self.protocol.write_ping(data)

@@ -4,7 +4,6 @@ import sys
 import textwrap
 import unittest
 
-from tornado.escape import utf8
 from tornado import gen
 from tornado.iostream import IOStream
 from tornado.log import app_log
@@ -122,11 +121,11 @@ class TestMultiprocess(unittest.TestCase):
     # processes, each of which prints its task id to stdout (a single
     # byte, so we don't have to worry about atomicity of the shared
     # stdout stream) and then exits.
-    def run_subproc(self, code):
+    def run_subproc(self, code: str) -> str:
         proc = subprocess.Popen(
             sys.executable, stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
-        proc.stdin.write(utf8(code))
+        proc.stdin.write(code.encode())
         proc.stdin.close()
         proc.wait()
         stdout = proc.stdout.read()

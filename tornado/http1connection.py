@@ -28,7 +28,6 @@ from tornado.concurrent import (
     future_add_done_callback,
     future_set_result_unless_cancelled,
 )
-from tornado.escape import utf8
 from tornado import gen
 from tornado import httputil
 from tornado import iostream
@@ -384,7 +383,7 @@ class HTTP1Connection(httputil.HTTPConnection):
         if self.is_client:
             assert isinstance(start_line, httputil.RequestStartLine)
             self._request_start_line = start_line
-            lines.append(utf8("%s %s HTTP/1.1" % (start_line[0], start_line[1])))
+            lines.append(("%s %s HTTP/1.1" % (start_line[0], start_line[1])).encode())
             # Client requests with a non-empty body must have either a
             # Content-Length or a Transfer-Encoding.
             self._chunking_output = (
@@ -400,7 +399,7 @@ class HTTP1Connection(httputil.HTTPConnection):
             assert self._request_start_line is not None
             assert self._request_headers is not None
             self._response_start_line = start_line
-            lines.append(utf8("HTTP/1.1 %d %s" % (start_line[1], start_line[2])))
+            lines.append(("HTTP/1.1 %d %s" % (start_line[1], start_line[2])).encode())
             self._chunking_output = (
                 # TODO: should this use
                 # self._request_start_line.version or
@@ -471,7 +470,7 @@ class HTTP1Connection(httputil.HTTPConnection):
         if self._chunking_output and chunk:
             # Don't write out empty chunks because that means END-OF-STREAM
             # with chunked encoding
-            return utf8("%x" % len(chunk)) + b"\r\n" + chunk + b"\r\n"
+            return ("%x" % len(chunk)).encode() + b"\r\n" + chunk + b"\r\n"
         else:
             return chunk
 

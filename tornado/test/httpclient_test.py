@@ -14,7 +14,6 @@ import typing  # noqa: F401
 import unicodedata
 import unittest
 
-from tornado.escape import utf8
 from tornado import gen
 from tornado.httpclient import (
     HTTPRequest,
@@ -333,7 +332,7 @@ Transfer-Encoding: chunked
             # Other methods are left alone.
             for method in ["GET", "OPTIONS", "PUT", "DELETE"]:
                 resp = self.fetch(url, method=method, allow_nonstandard_methods=True)
-                self.assertEqual(utf8(method), resp.body)
+                self.assertEqual(method.encode(), resp.body)
             # HEAD is different so check it separately.
             resp = self.fetch(url, method="HEAD")
             self.assertEqual(200, resp.code)
@@ -366,7 +365,7 @@ Transfer-Encoding: chunked
             headers={"Content-Type": "application/blah"},
         )
         self.assertEqual(response.headers["Content-Length"], "2")
-        self.assertEqual(response.body, utf8(unicode_body))
+        self.assertEqual(response.body, unicode_body.encode())
 
         # byte strings pass through directly
         response = self.fetch(
@@ -559,10 +558,10 @@ X-XSS-Protection: 1;
     def test_all_methods(self):
         for method in ["GET", "DELETE", "OPTIONS"]:
             response = self.fetch("/all_methods", method=method)
-            self.assertEqual(response.body, utf8(method))
+            self.assertEqual(response.body, method.encode())
         for method in ["POST", "PUT", "PATCH"]:
             response = self.fetch("/all_methods", method=method, body=b"")
-            self.assertEqual(response.body, utf8(method))
+            self.assertEqual(response.body, method.encode())
         response = self.fetch("/all_methods", method="HEAD")
         self.assertEqual(response.body, b"")
         response = self.fetch(
@@ -814,12 +813,12 @@ class HTTPRequestTestCase(unittest.TestCase):
 
     def test_body(self):
         request = HTTPRequest("http://example.com", body="foo")
-        self.assertEqual(request.body, utf8("foo"))
+        self.assertEqual(request.body, b"foo")
 
     def test_body_setter(self):
         request = HTTPRequest("http://example.com")
         request.body = "foo"  # type: ignore
-        self.assertEqual(request.body, utf8("foo"))
+        self.assertEqual(request.body, b"foo")
 
     def test_if_modified_since(self):
         http_date = datetime.datetime.utcnow()

@@ -361,7 +361,7 @@ class OAuthMixin(object):
             raise AuthError("Missing OAuth request token cookie")
         handler.clear_cookie("_oauth_request_token")
         cookie_key, cookie_secret = [
-            base64.b64decode(escape.utf8(i)) for i in request_cookie.split("|")
+            base64.b64decode(i) for i in request_cookie.split("|")
         ]
         if cookie_key != request_key:
             raise AuthError("Request token does not match cookie")
@@ -1127,7 +1127,7 @@ def _oauth_signature(
     key_elems.append(escape.utf8(token["secret"] if token else ""))
     key = b"&".join(key_elems)
 
-    hash = hmac.new(key, escape.utf8(base_string), hashlib.sha1)
+    hash = hmac.new(key, base_string.encode(), hashlib.sha1)
     return binascii.b2a_base64(hash.digest())[:-1]
 
 
@@ -1156,13 +1156,13 @@ def _oauth10a_signature(
     )
 
     base_string = "&".join(_oauth_escape(e) for e in base_elems)
-    key_elems = [escape.utf8(urllib.parse.quote(consumer_token["secret"], safe="~"))]
+    key_elems = [urllib.parse.quote(consumer_token["secret"], safe="~").encode()]
     key_elems.append(
-        escape.utf8(urllib.parse.quote(token["secret"], safe="~") if token else "")
+        urllib.parse.quote(token["secret"], safe="~").encode() if token else b""
     )
     key = b"&".join(key_elems)
 
-    hash = hmac.new(key, escape.utf8(base_string), hashlib.sha1)
+    hash = hmac.new(key, base_string.encode(), hashlib.sha1)
     return binascii.b2a_base64(hash.digest())[:-1]
 
 

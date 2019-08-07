@@ -2,7 +2,7 @@ import os
 import traceback
 import unittest
 
-from tornado.escape import utf8, to_unicode
+from tornado.escape import to_unicode
 from tornado.template import Template, DictLoader, ParseError, Loader
 from tornado.util import ObjectDict
 
@@ -16,7 +16,7 @@ class TemplateTest(unittest.TestCase):
 
     def test_bytes(self):
         template = Template("Hello {{ name }}!")
-        self.assertEqual(template.generate(name=utf8("Ben")), b"Hello Ben!")
+        self.assertEqual(template.generate(name=b"Ben"), b"Hello Ben!")
 
     def test_expressions(self):
         template = Template("2 + 2 = {{ 2 + 2 }}")
@@ -24,7 +24,7 @@ class TemplateTest(unittest.TestCase):
 
     def test_comment(self):
         template = Template("Hello{# TODO i18n #} {{ name }}!")
-        self.assertEqual(template.generate(name=utf8("Ben")), b"Hello Ben!")
+        self.assertEqual(template.generate(name=b"Ben"), b"Hello Ben!")
 
     def test_include(self):
         loader = DictLoader(
@@ -78,16 +78,16 @@ class TemplateTest(unittest.TestCase):
         )
 
     def test_unicode_template(self):
-        template = Template(utf8(u"\u00e9"))
-        self.assertEqual(template.generate(), utf8(u"\u00e9"))
+        template = Template("\u00e9".encode())
+        self.assertEqual(template.generate(), "\u00e9".encode())
 
     def test_unicode_literal_expression(self):
         # Unicode literals should be usable in templates.  Note that this
         # test simulates unicode characters appearing directly in the
         # template file (with utf8 encoding), i.e. \u escapes would not
         # be used in the template file itself.
-        template = Template(utf8(u'{{ "\u00e9" }}'))
-        self.assertEqual(template.generate(), utf8(u"\u00e9"))
+        template = Template('{{ "\u00e9" }}'.encode())
+        self.assertEqual(template.generate(), "\u00e9".encode())
 
     def test_custom_namespace(self):
         loader = DictLoader(
@@ -99,54 +99,51 @@ class TemplateTest(unittest.TestCase):
         def upper(s):
             return s.upper()
 
-        template = Template(utf8("{% apply upper %}foo{% end %}"))
+        template = Template(b"{% apply upper %}foo{% end %}")
         self.assertEqual(template.generate(upper=upper), b"FOO")
 
     def test_unicode_apply(self):
         def upper(s):
             return to_unicode(s).upper()
 
-        template = Template(utf8(u"{% apply upper %}foo \u00e9{% end %}"))
-        self.assertEqual(template.generate(upper=upper), utf8(u"FOO \u00c9"))
+        template = Template("{% apply upper %}foo \u00e9{% end %}".encode())
+        self.assertEqual(template.generate(upper=upper), "FOO \u00c9".encode())
 
     def test_bytes_apply(self):
         def upper(s):
-            return utf8(to_unicode(s).upper())
+            return to_unicode(s).upper().encode()
 
-        template = Template(utf8(u"{% apply upper %}foo \u00e9{% end %}"))
-        self.assertEqual(template.generate(upper=upper), utf8(u"FOO \u00c9"))
+        template = Template("{% apply upper %}foo \u00e9{% end %}".encode())
+        self.assertEqual(template.generate(upper=upper), "FOO \u00c9".encode())
 
     def test_if(self):
-        template = Template(utf8("{% if x > 4 %}yes{% else %}no{% end %}"))
+        template = Template(b"{% if x > 4 %}yes{% else %}no{% end %}")
         self.assertEqual(template.generate(x=5), b"yes")
         self.assertEqual(template.generate(x=3), b"no")
 
     def test_if_empty_body(self):
-        template = Template(utf8("{% if True %}{% else %}{% end %}"))
+        template = Template(b"{% if True %}{% else %}{% end %}")
         self.assertEqual(template.generate(), b"")
 
     def test_try(self):
         template = Template(
-            utf8(
-                """{% try %}
+            b"""{% try %}
 try{% set y = 1/x %}
 {% except %}-except
 {% else %}-else
 {% finally %}-finally
 {% end %}"""
-            )
         )
         self.assertEqual(template.generate(x=1), b"\ntry\n-else\n-finally\n")
         self.assertEqual(template.generate(x=0), b"\ntry-except\n-finally\n")
 
     def test_comment_directive(self):
-        template = Template(utf8("{% comment blah blah %}foo"))
+        template = Template(b"{% comment blah blah %}foo")
         self.assertEqual(template.generate(), b"foo")
 
     def test_break_continue(self):
         template = Template(
-            utf8(
-                """\
+            b"""\
 {% for i in range(10) %}
     {% if i == 2 %}
         {% continue %}
@@ -156,7 +153,6 @@ try{% set y = 1/x %}
         {% break %}
     {% end %}
 {% end %}"""
-            )
         )
         result = template.generate()
         # remove extraneous whitespace
@@ -165,7 +161,7 @@ try{% set y = 1/x %}
 
     def test_break_outside_loop(self):
         try:
-            Template(utf8("{% break %}"))
+            Template(b"{% break %}")
             raise Exception("Did not get expected exception")
         except ParseError:
             pass
@@ -174,9 +170,7 @@ try{% set y = 1/x %}
         # This test verifies current behavior, although of course it would
         # be nice if apply didn't cause seemingly unrelated breakage
         try:
-            Template(
-                utf8("{% for i in [] %}{% apply foo %}{% break %}{% end %}{% end %}")
-            )
+            Template(b"{% for i in [] %}{% apply foo %}{% break %}{% end %}{% end %}")
             raise Exception("Did not get expected exception")
         except ParseError:
             pass

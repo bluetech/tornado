@@ -11,7 +11,6 @@ from tornado.httputil import (
     HTTPInputError,
     HTTPFile,
 )
-from tornado.escape import utf8
 from tornado.log import gen_log
 from tornado.testing import ExpectLog
 
@@ -149,7 +148,7 @@ Foo
             ).replace(
                 '"', '\\"'
             )
-            data = utf8(str_data.replace("\n", "\r\n"))
+            data = str_data.replace("\n", "\r\n").encode()
             args, files = form_data_args()
             parse_multipart_form_data(b"1234", data, args, files)
             file = files["files"][0]

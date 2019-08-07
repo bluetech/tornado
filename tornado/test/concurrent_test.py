@@ -23,7 +23,7 @@ from tornado.concurrent import (
     run_on_executor,
     future_set_result_unless_cancelled,
 )
-from tornado.escape import utf8, to_unicode
+from tornado.escape import to_unicode
 from tornado import gen
 from tornado.iostream import IOStream
 from tornado.tcpserver import TCPServer
@@ -54,12 +54,11 @@ class CapServer(TCPServer):
     @gen.coroutine
     def handle_stream(self, stream, address):
         data = yield stream.read_until(b"\n")
-        data = data.decode()
         if data == data.upper():
             stream.write(b"error\talready capitalized\n")
         else:
             # data already has \n
-            stream.write(utf8("ok\t%s" % data.upper()))
+            stream.write(b"ok\t%s" % data.upper())
         stream.close()
 
 
@@ -84,12 +83,12 @@ class BaseCapClient(object):
 
 class GeneratorCapClient(BaseCapClient):
     @gen.coroutine
-    def capitalize(self, request_data):
+    def capitalize(self, request_data: str):
         logging.debug("capitalize")
         stream = IOStream(socket.socket())
         logging.debug("connecting")
         yield stream.connect(("127.0.0.1", self.port))
-        stream.write(utf8(request_data + "\n"))
+        stream.write(request_data.encode() + b"\n")
         logging.debug("reading")
         data = yield stream.read_until(b"\n")
         logging.debug("returning")

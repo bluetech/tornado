@@ -3367,7 +3367,7 @@ def create_signed_value(
     if clock is None:
         clock = time.time
 
-    timestamp = utf8(str(int(clock())))
+    timestamp = str(int(clock())).encode()
     value = base64.b64encode(utf8(value))
     if version == 1:
         assert not isinstance(secret, dict)
@@ -3390,7 +3390,7 @@ def create_signed_value(
         # - value (base64-encoded)
         # - signature (hex-encoded; no length prefix)
         def format_field(s: Union[str, bytes]) -> bytes:
-            return utf8("%d:" % len(s)) + utf8(s)
+            return (b"%d:" % len(s)) + utf8(s)
 
         to_sign = b"|".join(
             [
@@ -3482,7 +3482,7 @@ def _decode_signed_value_v1(
     max_age_days: int,
     clock: Callable[[], float],
 ) -> Optional[bytes]:
-    parts = utf8(value).split(b"|")
+    parts = value.split(b"|")
     if len(parts) != 3:
         return None
     signature = _create_signature_v1(secret, name, parts[0], parts[1])
@@ -3554,7 +3554,7 @@ def _decode_signed_value_v2(
     expected_sig = _create_signature_v2(secret, signed_string)
     if not hmac.compare_digest(passed_sig, expected_sig):
         return None
-    if name_field != utf8(name):
+    if name_field != name.encode():
         return None
     timestamp = int(timestamp_bytes)
     if timestamp < clock() - max_age_days * 86400:
@@ -3583,13 +3583,13 @@ def _create_signature_v1(secret: Union[str, bytes], *parts: Union[str, bytes]) -
     hash = hmac.new(utf8(secret), digestmod=hashlib.sha1)
     for part in parts:
         hash.update(utf8(part))
-    return utf8(hash.hexdigest())
+    return hash.hexdigest().encode()
 
 
 def _create_signature_v2(secret: Union[str, bytes], s: bytes) -> bytes:
     hash = hmac.new(utf8(secret), digestmod=hashlib.sha256)
     hash.update(utf8(s))
-    return utf8(hash.hexdigest())
+    return hash.hexdigest().encode()
 
 
 def is_absolute(path: str) -> bool:

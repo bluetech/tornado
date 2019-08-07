@@ -696,7 +696,7 @@ class _Text(_Node):
             value = filter_whitespace(self.whitespace, value)
 
         if value:
-            writer.write_line("_tt_append(%r)" % escape.utf8(value), self.line)
+            writer.write_line("_tt_append(%r)" % value.encode(), self.line)
 
 
 class ParseError(Exception):

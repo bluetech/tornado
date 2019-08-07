@@ -1,6 +1,6 @@
 from tornado.concurrent import Future
 from tornado import gen
-from tornado.escape import json_decode, utf8, to_unicode, recursive_unicode
+from tornado.escape import json_decode, to_unicode, recursive_unicode
 from tornado.httpclient import HTTPClientError
 from tornado.httputil import format_timestamp
 from tornado.iostream import IOStream
@@ -144,9 +144,7 @@ class SecureCookieV1Test(unittest.TestCase):
             sig,
         )
         # tamper with the cookie
-        handler._cookies["foo"] = utf8(
-            "1234|5678%s|%s" % (timestamp.decode(), sig.decode())
-        )
+        handler._cookies["foo"] = b"1234|5678%s|%s" % (timestamp, sig)
         # it gets rejected
         with ExpectLog(gen_log, "Cookie timestamp in future"):
             self.assertTrue(handler.get_secure_cookie("foo", min_version=1) is None)
@@ -361,7 +359,7 @@ class CookieTest(WebTestCase):
         for header, expected in data:
             logging.debug("trying %r", header)
             response = self.fetch("/get", headers={"Cookie": header})
-            self.assertEqual(response.body, utf8(expected))
+            self.assertEqual(response.body, expected.encode())
 
     def test_set_cookie_overwrite(self):
         response = self.fetch("/set_overwrite")
@@ -1117,7 +1115,11 @@ class StaticFileTest(WebTestCase):
         response = self.fetch("/abs_static_url/robots.txt")
         self.assertEqual(
             response.body,
-            (utf8(self.get_url("/")) + b"static/robots.txt?v=" + self.robots_txt_hash),
+            (
+                self.get_url("/").encode()
+                + b"static/robots.txt?v="
+                + self.robots_txt_hash
+            ),
         )
 
     def test_relative_version_exclusion(self):
@@ -1126,7 +1128,9 @@ class StaticFileTest(WebTestCase):
 
     def test_absolute_version_exclusion(self):
         response = self.fetch("/abs_static_url/robots.txt?include_version=0")
-        self.assertEqual(response.body, utf8(self.get_url("/") + "static/robots.txt"))
+        self.assertEqual(
+            response.body, self.get_url("/").encode() + b"static/robots.txt"
+        )
 
     def test_include_host_override(self):
         self._trigger_include_host_check(False)
@@ -1135,7 +1139,7 @@ class StaticFileTest(WebTestCase):
     def _trigger_include_host_check(self, include_host):
         path = "/override_static_url/robots.txt?include_host=%s"
         response = self.fetch(path % int(include_host))
-        self.assertEqual(response.body, utf8(str(True)))
+        self.assertEqual(response.body, str(True).encode())
 
     def get_and_head(self, *args, **kwargs):
         """Performs a GET and HEAD request and returns the GET response.
@@ -1217,7 +1221,7 @@ class StaticFileTest(WebTestCase):
     def test_static_etag(self):
         response = self.get_and_head("/static/robots.txt")
         self.assertEqual(
-            utf8(response.headers.get("Etag")), b'"' + self.robots_txt_hash + b'"'
+            response.headers.get("Etag").encode(), b'"' + self.robots_txt_hash + b'"'
         )
 
     def test_static_with_range(self):
@@ -1227,7 +1231,7 @@ class StaticFileTest(WebTestCase):
         self.assertEqual(response.code, 206)
         self.assertEqual(response.body, b"User-agent")
         self.assertEqual(
-            utf8(response.headers.get("Etag")), b'"' + self.robots_txt_hash + b'"'
+            response.headers.get("Etag").encode(), b'"' + self.robots_txt_hash + b'"'
         )
         self.assertEqual(response.headers.get("Content-Length"), "10")
         self.assertEqual(response.headers.get("Content-Range"), "bytes 0-9/26")
@@ -1240,8 +1244,8 @@ class StaticFileTest(WebTestCase):
         # to ``Range: bytes=0-`` :(
         self.assertEqual(response.code, 200)
         robots_file_path = os.path.join(self.static_dir, "robots.txt")
-        with open(robots_file_path) as f:
-            self.assertEqual(response.body, utf8(f.read()))
+        with open(robots_file_path, "rb", encoding="utf-8") as f:
+            self.assertEqual(response.body, f.read())
         self.assertEqual(response.headers.get("Content-Length"), "26")
         self.assertEqual(response.headers.get("Content-Range"), None)
 
@@ -1251,8 +1255,8 @@ class StaticFileTest(WebTestCase):
         )
         self.assertEqual(response.code, 200)
         robots_file_path = os.path.join(self.static_dir, "robots.txt")
-        with open(robots_file_path) as f:
-            self.assertEqual(response.body, utf8(f.read()))
+        with open(robots_file_path, "rb", encoding="utf-8") as f:
+            self.assertEqual(response.body, f.read())
         self.assertEqual(response.headers.get("Content-Length"), "26")
         self.assertEqual(response.headers.get("Content-Range"), None)
 
@@ -1262,8 +1266,8 @@ class StaticFileTest(WebTestCase):
         )
         self.assertEqual(response.code, 206)
         robots_file_path = os.path.join(self.static_dir, "robots.txt")
-        with open(robots_file_path) as f:
-            self.assertEqual(response.body, utf8(f.read()[1:]))
+        with open(robots_file_path, "rb", encoding="utf-8") as f:
+            self.assertEqual(response.body, f.read()[1:])
         self.assertEqual(response.headers.get("Content-Length"), "25")
         self.assertEqual(response.headers.get("Content-Range"), "bytes 1-25/26")
 
@@ -1289,8 +1293,8 @@ class StaticFileTest(WebTestCase):
         )
         self.assertEqual(response.code, 200)
         robots_file_path = os.path.join(self.static_dir, "robots.txt")
-        with open(robots_file_path) as f:
-            self.assertEqual(response.body, utf8(f.read()))
+        with open(robots_file_path, "rb", encoding="utf-8") as f:
+            self.assertEqual(response.body, f.read())
         self.assertEqual(response.headers.get("Content-Length"), "26")
         self.assertEqual(response.headers.get("Content-Range"), None)
 
@@ -1326,7 +1330,7 @@ class StaticFileTest(WebTestCase):
         self.assertEqual(response.body, b"")
         self.assertEqual(response.headers["Content-Length"], "26")
         self.assertEqual(
-            utf8(response.headers["Etag"]), b'"' + self.robots_txt_hash + b'"'
+            response.headers["Etag"].encode(), b'"' + self.robots_txt_hash + b'"'
         )
 
     def test_static_head_range(self):
@@ -1337,7 +1341,7 @@ class StaticFileTest(WebTestCase):
         self.assertEqual(response.body, b"")
         self.assertEqual(response.headers["Content-Length"], "4")
         self.assertEqual(
-            utf8(response.headers["Etag"]), b'"' + self.robots_txt_hash + b'"'
+            response.headers["Etag"].encode(), b'"' + self.robots_txt_hash + b'"'
         )
 
     def test_static_range_if_none_match(self):
@@ -1352,7 +1356,7 @@ class StaticFileTest(WebTestCase):
         self.assertEqual(response.body, b"")
         self.assertTrue("Content-Length" not in response.headers)
         self.assertEqual(
-            utf8(response.headers["Etag"]), b'"' + self.robots_txt_hash + b'"'
+            response.headers["Etag"].encode(), b'"' + self.robots_txt_hash + b'"'
         )
 
     def test_static_404(self):
@@ -2101,10 +2105,10 @@ class AllHTTPMethodsTest(SimpleHandlerTestCase):
         self.assertEqual(response.body, b"")
         for method in ["GET", "DELETE", "OPTIONS"]:
             response = self.fetch("/", method=method)
-            self.assertEqual(response.body, utf8(method))
+            self.assertEqual(response.body, method.encode())
         for method in ["POST", "PUT"]:
             response = self.fetch("/", method=method, body=b"")
-            self.assertEqual(response.body, utf8(method))
+            self.assertEqual(response.body, method.encode())
 
 
 class PatchMethodTest(SimpleHandlerTestCase):

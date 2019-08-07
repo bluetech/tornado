@@ -245,7 +245,7 @@ class HTTPConnectionTest(AsyncHTTPTestCase):
                 lambda: stream.connect(("127.0.0.1", self.get_http_port()))
             )
             stream.write(
-                newline.join(headers + [utf8("Content-Length: %d" % len(body))])
+                newline.join(headers + [b"Content-Length: %d" % len(body)])
                 + newline
                 + newline
                 + body
@@ -921,13 +921,13 @@ class GzipBaseTest(object):
     def get_app(self):
         return Application([("/", EchoHandler)])
 
-    def post_gzip(self, body):
+    def post_gzip(self, body: bytes):
         bytesio = BytesIO()
         gzip_file = gzip.GzipFile(mode="w", fileobj=bytesio)
-        gzip_file.write(utf8(body))
+        gzip_file.write(body)
         gzip_file.close()
         compressed_body = bytesio.getvalue()
-        return self.fetch(
+        return self.fetch(  # type: ignore
             "/",
             method="POST",
             body=compressed_body,
@@ -944,7 +944,7 @@ class GzipTest(GzipBaseTest, AsyncHTTPTestCase):
         return dict(decompress_request=True)
 
     def test_gzip(self):
-        response = self.post_gzip("foo=bar")
+        response = self.post_gzip(b"foo=bar")
         self.assertEquals(json_decode(response.body), {u"foo": [u"bar"]})
 
 
@@ -954,7 +954,7 @@ class GzipUnsupportedTest(GzipBaseTest, AsyncHTTPTestCase):
         # the body (but parsing form bodies is currently just a log message,
         # not a fatal error).
         with ExpectLog(gen_log, "Unsupported Content-Encoding"):
-            response = self.post_gzip("foo=bar")
+            response = self.post_gzip(b"foo=bar")
         self.assertEquals(json_decode(response.body), {})
 
 

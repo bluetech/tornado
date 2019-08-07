@@ -26,7 +26,6 @@ import twisted.names.resolve  # type: ignore
 
 
 from tornado.concurrent import Future, future_set_exc_info
-from tornado.escape import utf8
 from tornado import gen
 from tornado.netutil import Resolver
 
@@ -81,7 +80,7 @@ class TwistedResolver(Resolver):
             resolved = host
             resolved_family = socket.AF_INET6
         else:
-            deferred = self.resolver.getHostByName(utf8(host))
+            deferred = self.resolver.getHostByName(host.encode())
             fut = Future()  # type: Future[Any]
             deferred.addBoth(fut.set_result)
             resolved = yield fut
