@@ -163,9 +163,6 @@ def parse_qs_bytes(
     return encoded
 
 
-_UTF8_TYPES = (bytes, type(None))
-
-
 @typing.overload
 def utf8(value: bytes) -> bytes:
     pass
@@ -187,7 +184,7 @@ def utf8(value: Union[None, str, bytes]) -> Optional[bytes]:  # noqa: F811
     If the argument is already a byte string or None, it is returned unchanged.
     Otherwise it must be a unicode string and is encoded as utf8.
     """
-    if isinstance(value, _UTF8_TYPES):
+    if value is None or isinstance(value, bytes):
         return value
     if not isinstance(value, str):
         raise TypeError("Expected bytes, str, or None; got %r" % type(value))
