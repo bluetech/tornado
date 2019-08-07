@@ -31,7 +31,7 @@ import logging
 import logging.handlers
 import sys
 
-from tornado.escape import _unicode
+from tornado.escape import to_unicode
 
 try:
     import colorama  # type: ignore
@@ -72,7 +72,7 @@ def _stderr_supports_color() -> bool:
 
 def _safe_unicode(s: Any) -> str:
     try:
-        return _unicode(s)
+        return to_unicode(s)
     except UnicodeDecodeError:
         return repr(s)
 

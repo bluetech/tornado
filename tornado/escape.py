@@ -56,7 +56,7 @@ def xhtml_escape(value: Union[str, bytes]) -> str:
 
 def xhtml_unescape(value: Union[str, bytes]) -> str:
     """Un-escapes an XML-escaped string."""
-    return re.sub(r"&(#?)(\w+?);", _convert_entity, _unicode(value))
+    return re.sub(r"&(#?)(\w+?);", _convert_entity, to_unicode(value))
 
 
 # The fact that json_encode wraps json.dumps is an implementation detail.
@@ -369,7 +369,7 @@ def linkify(
     # First HTML-escape so that our strings are all safe.
     # The regex is modified to avoid character entites other than &amp; so
     # that we won't pick up &quot;, etc.
-    text = _unicode(xhtml_escape(text))
+    text = xhtml_escape(text)
     return _URL_RE.sub(make_link, text)
 
 

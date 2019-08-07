@@ -1,5 +1,5 @@
 from tornado import gen, netutil
-from tornado.escape import json_decode, json_encode, utf8, _unicode, recursive_unicode
+from tornado.escape import json_decode, json_encode, utf8, recursive_unicode
 from tornado.http1connection import HTTP1Connection
 from tornado.httpclient import HTTPError
 from tornado.httpserver import HTTPServer
@@ -223,7 +223,7 @@ class MultipartTestHandler(RequestHandler):
                 "header": self.request.headers["X-Header-Encoding-Test"],
                 "argument": self.get_argument("argument"),
                 "filename": self.request.files["files"][0].filename,
-                "filebody": _unicode(self.request.files["files"][0]["body"]),
+                "filebody": self.request.files["files"][0]["body"].decode(),
             }
         )
 

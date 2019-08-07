@@ -91,7 +91,7 @@ import tornado.locale
 from tornado import locale
 from tornado.log import access_log, app_log, gen_log
 from tornado import template
-from tornado.escape import utf8, _unicode
+from tornado.escape import utf8
 from tornado.routing import (
     AnyMatches,
     DefaultHostMatches,
@@ -568,7 +568,7 @@ class RequestHandler(object):
         (e.g. for unnamed groups in the url regex).
         """
         try:
-            return _unicode(value)
+            return value.decode("utf-8")
         except UnicodeDecodeError:
             raise HTTPError(
                 400, "Invalid unicode in %s: %r" % (name or "url", value[:40])
@@ -873,8 +873,10 @@ class RequestHandler(object):
                 js_embed.append(utf8(embed_part))
             file_part = module.javascript_files()
             if file_part:
-                if isinstance(file_part, (str, bytes)):
-                    js_files.append(_unicode(file_part))
+                if isinstance(file_part, str):
+                    js_files.append(file_part)
+                elif isinstance(file_part, bytes):
+                    js_files.append(file_part.decode())
                 else:
                     js_files.extend(file_part)
             embed_part = module.embedded_css()
@@ -882,8 +884,10 @@ class RequestHandler(object):
                 css_embed.append(utf8(embed_part))
             file_part = module.css_files()
             if file_part:
-                if isinstance(file_part, (str, bytes)):
-                    css_files.append(_unicode(file_part))
+                if isinstance(file_part, str):
+                    css_files.append(file_part)
+                elif isinstance(file_part, bytes):
+                    css_files.append(file_part.decode())
                 else:
                     css_files.extend(file_part)
             head_part = module.html_head()
@@ -3109,7 +3113,7 @@ class GZipContentEncoding(OutputTransform):
         else:
             headers["Vary"] = "Accept-Encoding"
         if self._gzipping:
-            ctype = _unicode(headers.get("Content-Type", "")).split(";")[0]
+            ctype = headers.get("Content-Type", "").split(";")[0]
             self._gzipping = (
                 self._compressible_type(ctype)
                 and (not finishing or len(chunk) >= self.MIN_LENGTH)

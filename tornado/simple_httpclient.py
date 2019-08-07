@@ -1,4 +1,3 @@
-from tornado.escape import _unicode
 from tornado import gen
 from tornado.httpclient import (
     HTTPResponse,
@@ -288,7 +287,7 @@ class _HTTPConnection(httputil.HTTPMessageDelegate):
 
     async def run(self) -> None:
         try:
-            self.parsed = urllib.parse.urlsplit(_unicode(self.request.url))
+            self.parsed = urllib.parse.urlsplit(self.request.url)
             if self.parsed.scheme not in ("http", "https"):
                 raise ValueError("Unsupported url scheme: %s" % self.request.url)
             # urlsplit results have hostname and port results, but they
@@ -385,10 +384,11 @@ class _HTTPConnection(httputil.HTTPMessageDelegate):
                         raise ValueError(
                             "unsupported auth_mode %s", self.request.auth_mode
                         )
-                    self.request.headers["Authorization"] = "Basic " + _unicode(
-                        base64.b64encode(
+                    self.request.headers["Authorization"] = (
+                        "Basic "
+                        + base64.b64encode(
                             httputil.encode_username_password(username, password)
-                        )
+                        ).decode()
                     )
                 if self.request.user_agent:
                     self.request.headers["User-Agent"] = self.request.user_agent

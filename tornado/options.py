@@ -100,7 +100,6 @@ import sys
 import os
 import textwrap
 
-from tornado.escape import _unicode
 from tornado.log import define_logging_options
 from tornado.util import exec_in
 
@@ -661,7 +660,7 @@ class _Option(object):
         return value.lower() not in ("false", "0", "f")
 
     def _parse_string(self, value: str) -> str:
-        return _unicode(value)
+        return value
 
 
 options = OptionParser()
