@@ -29,7 +29,7 @@ from urllib.parse import urlparse
 import zlib
 
 from tornado.concurrent import Future, future_set_result_unless_cancelled
-from tornado.escape import utf8, to_unicode
+from tornado.escape import utf8
 from tornado import gen, httpclient, httputil
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.iostream import StreamClosedError, IOStream
@@ -1241,7 +1241,7 @@ class WebSocketProtocol13(WebSocketProtocol):
             if len(data) >= 2:
                 self.close_code = struct.unpack(">H", data[:2])[0]
             if len(data) > 2:
-                self.close_reason = to_unicode(data[2:])
+                self.close_reason = data[2:].decode()
             # Echo the received close code, if any (RFC 6455 section 5.5.1).
             self.close(self.close_code)
         elif opcode == 0x9:

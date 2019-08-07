@@ -533,4 +533,4 @@ class TemplateLoaderTest(unittest.TestCase):
     def test_utf8_in_file(self):
         tmpl = self.loader.load("utf8.html")
         result = tmpl.generate()
-        self.assertEqual(to_unicode(result).strip(), u"H\u00e9llo")
+        self.assertEqual(result.decode().strip(), "H\u00e9llo")

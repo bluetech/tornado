@@ -7,7 +7,6 @@ from tornado.escape import (
     xhtml_unescape,
     url_escape,
     url_unescape,
-    to_unicode,
     json_decode,
     json_encode,
     squeeze,
@@ -262,7 +261,7 @@ class EscapeTestCase(unittest.TestCase):
             # input strings to url_unescape should only contain ascii
             # characters, but make sure the function accepts both byte
             # and unicode strings.
-            self.assertEqual(url_unescape(to_unicode(escaped), encoding), unescaped)
+            self.assertEqual(url_unescape(escaped, encoding), unescaped)
             self.assertEqual(url_unescape(utf8(escaped), encoding), unescaped)
 
     def test_url_escape_quote_plus(self):

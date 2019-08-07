@@ -9,7 +9,7 @@ import ssl
 import sys
 import typing  # noqa: F401
 
-from tornado.escape import to_unicode, utf8
+from tornado.escape import utf8
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 from tornado.httputil import HTTPHeaders, ResponseStartLine
@@ -496,7 +496,7 @@ class SimpleHTTPClientTestMixin(object):
             header_callback=headers.append,
             streaming_callback=chunk_bytes.append,
         )
-        chunks = list(map(to_unicode, chunk_bytes))
+        chunks = [c.decode() for c in chunk_bytes]
         self.assertEqual(chunks, ["Hello world!"])
         # Make sure we only got one set of headers.
         num_start_lines = len([h for h in headers if h.startswith("HTTP/")])

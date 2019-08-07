@@ -768,9 +768,7 @@ class WSGISafeWebTest(WebTestCase):
         return json_decode(response.body)
 
     def test_types(self):
-        cookie_value = to_unicode(
-            create_signed_value(self.COOKIE_SECRET, "asdf", "qwer")
-        )
+        cookie_value = create_signed_value(self.COOKIE_SECRET, "asdf", "qwer").decode()
         response = self.fetch(
             "/typecheck/asdf?foo=bar", headers={"Cookie": "asdf=" + cookie_value}
         )

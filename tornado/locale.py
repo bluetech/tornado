@@ -46,7 +46,6 @@ import gettext
 import os
 import re
 
-from tornado import escape
 from tornado.log import gen_log
 
 from tornado._locale_data import LOCALE_NAMES
@@ -156,7 +155,7 @@ def load_translations(directory: str, encoding: Optional[str] = None) -> None:
             for i, row in enumerate(csv.reader(f)):
                 if not row or len(row) < 2:
                     continue
-                row = [escape.to_unicode(c).strip() for c in row]
+                row = [c.strip() for c in row]
                 english, translation = row[:2]
                 if len(row) > 2:
                     plural = row[2] or "unknown"

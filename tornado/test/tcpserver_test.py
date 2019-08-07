@@ -4,7 +4,7 @@ import sys
 import textwrap
 import unittest
 
-from tornado.escape import utf8, to_unicode
+from tornado.escape import utf8
 from tornado import gen
 from tornado.iostream import IOStream
 from tornado.log import app_log
@@ -135,7 +135,7 @@ class TestMultiprocess(unittest.TestCase):
             raise RuntimeError(
                 "Process returned %d. stdout=%r" % (proc.returncode, stdout)
             )
-        return to_unicode(stdout)
+        return stdout.decode()
 
     def test_single(self):
         # As a sanity check, run the single-process version through this test

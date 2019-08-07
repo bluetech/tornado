@@ -249,7 +249,7 @@ def recursive_unicode(obj: Any) -> Any:
     elif isinstance(obj, tuple):
         return tuple(recursive_unicode(i) for i in obj)
     elif isinstance(obj, bytes):
-        return to_unicode(obj)
+        return obj.decode()
     else:
         return obj
 
@@ -259,12 +259,8 @@ def recursive_unicode(obj: Any) -> Any:
 # but it gets all exponential on certain patterns (such as too many trailing
 # dots), causing the regex matcher to never return.
 # This regex should avoid those problems.
-# Use to_unicode instead of tornado.util.u - we don't want backslashes getting
-# processed as escapes.
 _URL_RE = re.compile(
-    to_unicode(
-        r"""\b((?:([\w-]+):(/{1,3})|www[.])(?:(?:(?:[^\s&()]|&amp;|&quot;)*(?:[^!"#$%&'()*+,.:;<=>?@\[\]^`{|}~\s]))|(?:\((?:[^\s&()]|&amp;|&quot;)*\)))+)"""  # noqa: E501
-    )
+    r"""\b((?:([\w-]+):(/{1,3})|www[.])(?:(?:(?:[^\s&()]|&amp;|&quot;)*(?:[^!"#$%&'()*+,.:;<=>?@\[\]^`{|}~\s]))|(?:\((?:[^\s&()]|&amp;|&quot;)*\)))+)"""  # noqa: E501
 )
 
 

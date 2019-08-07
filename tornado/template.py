@@ -325,7 +325,7 @@ class Template(object):
             # The dont_inherit flag prevents template.py's future imports
             # from being applied to the generated code.
             self.compiled = compile(
-                escape.to_unicode(self.code),
+                self.code,
                 "%s.generated.py" % self.name.replace(".", "_"),
                 "exec",
                 dont_inherit=True,

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 import tornado.locale
-from tornado.escape import utf8, to_unicode
+from tornado.escape import utf8
 
 
 class TranslationLoaderTest(unittest.TestCase):
@@ -39,7 +39,7 @@ class TranslationLoaderTest(unittest.TestCase):
             os.path.join(os.path.dirname(__file__), "csv_translations", "fr_FR.csv"),
             "rb",
         ) as f:
-            char_data = to_unicode(f.read())
+            char_data = f.read().decode()
         # Re-encode our input data (which is utf-8 without BOM) in
         # encodings that use the BOM and ensure that we can still load
         # it. Note that utf-16-le and utf-16-be do not write a BOM,

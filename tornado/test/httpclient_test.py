@@ -14,7 +14,7 @@ import typing  # noqa: F401
 import unicodedata
 import unittest
 
-from tornado.escape import utf8, to_unicode
+from tornado.escape import utf8
 from tornado import gen
 from tornado.httpclient import (
     HTTPRequest,
@@ -344,7 +344,7 @@ Transfer-Encoding: chunked
             url = "/redirect?url=/all_methods&status=307"
             for method in ["GET", "OPTIONS", "POST", "PUT", "DELETE"]:
                 resp = self.fetch(url, method=method, allow_nonstandard_methods=True)
-                self.assertEqual(method, to_unicode(resp.body))
+                self.assertEqual(method, resp.body.decode())
             resp = self.fetch(url, method="HEAD")
             self.assertEqual(200, resp.code)
             self.assertEqual(b"", resp.body)
@@ -792,7 +792,7 @@ class SyncHTTPClientSubprocessTest(unittest.TestCase):
         )
         if proc.stdout:
             print("STDOUT:")
-            print(to_unicode(proc.stdout))
+            print(proc.stdout.decode())
         if proc.stdout:
             self.fail("subprocess produced unexpected output")
 

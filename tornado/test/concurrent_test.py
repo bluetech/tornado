@@ -54,7 +54,7 @@ class CapServer(TCPServer):
     @gen.coroutine
     def handle_stream(self, stream, address):
         data = yield stream.read_until(b"\n")
-        data = to_unicode(data)
+        data = data.decode()
         if data == data.upper():
             stream.write(b"error\talready capitalized\n")
         else:
