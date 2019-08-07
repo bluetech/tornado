@@ -28,7 +28,6 @@ class except to start a server at the beginning of the process
 import socket
 import ssl
 
-from tornado.escape import native_str
 from tornado.http1connection import HTTP1ServerConnection, HTTP1ConnectionParameters
 from tornado import httputil
 from tornado import iostream
@@ -322,10 +321,10 @@ class _HTTPRequestContext(object):
         if self.address_family in (socket.AF_INET, socket.AF_INET6):
             return self.remote_ip
         elif isinstance(self.address, bytes):
-            # Python 3 with the -bb option warns about str(bytes),
+            # Python with the -bb option warns about str(bytes),
             # so convert it explicitly.
             # Unix socket addresses are str on mac but bytes on linux.
-            return native_str(self.address)
+            return self.address.decode("utf-8")
         else:
             return str(self.address)
 

@@ -12,7 +12,6 @@ import types
 from unittest import mock
 import unittest
 
-from tornado.escape import native_str
 from tornado import gen
 from tornado.ioloop import IOLoop, TimeoutError, PeriodicCallback
 from tornado.log import app_log
@@ -684,13 +683,13 @@ class TestPeriodicCallbackMath(unittest.TestCase):
 
 
 class TestIOLoopConfiguration(unittest.TestCase):
-    def run_python(self, *statements):
+    def run_python(self, *statements) -> str:
         stmt_list = [
             "from tornado.ioloop import IOLoop",
             "classname = lambda x: x.__class__.__name__",
         ] + list(statements)
         args = [sys.executable, "-c", "; ".join(stmt_list)]
-        return native_str(subprocess.check_output(args)).strip()
+        return subprocess.check_output(args).strip()
 
     def test_default(self):
         # When asyncio is available, it is used by default.

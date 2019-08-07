@@ -1,12 +1,5 @@
 from tornado import gen, netutil
-from tornado.escape import (
-    json_decode,
-    json_encode,
-    utf8,
-    _unicode,
-    recursive_unicode,
-    native_str,
-)
+from tornado.escape import json_decode, json_encode, utf8, _unicode, recursive_unicode
 from tornado.http1connection import HTTP1Connection
 from tornado.httpclient import HTTPError
 from tornado.httpserver import HTTPServer
@@ -323,7 +316,7 @@ class HTTPConnectionTest(AsyncHTTPTestCase):
         first_line = yield stream.read_until(b"\r\n")
         self.assertTrue(first_line.startswith(b"HTTP/1.1 200"), first_line)
         header_data = yield stream.read_until(b"\r\n\r\n")
-        headers = HTTPHeaders.parse(native_str(header_data.decode("latin1")))
+        headers = HTTPHeaders.parse(header_data.decode("latin1"))
         body = yield stream.read_bytes(int(headers["Content-Length"]))
         self.assertEqual(body, b"Got 1024 bytes in POST")
         stream.close()

@@ -1174,9 +1174,8 @@ def _oauth_escape(val: Union[str, bytes]) -> str:
 
 def _oauth_parse_response(body: bytes) -> Dict[str, Any]:
     # I can't find an officially-defined encoding for oauth responses and
-    # have never seen anyone use non-ascii.  Leave the response in a byte
-    # string for python 2, and use utf8 on python 3.
-    body_str = escape.native_str(body)
+    # have never seen anyone use non-ascii.  Use UTF-8.
+    body_str = body.decode("utf-8")
     p = urllib.parse.parse_qs(body_str, keep_blank_values=False)
     token = dict(key=p["oauth_token"][0], secret=p["oauth_token_secret"][0])
 

@@ -355,7 +355,7 @@ class RequestHandler(object):
         """
         self._status_code = status_code
         if reason is not None:
-            self._reason = escape.native_str(reason)
+            self._reason = reason
         else:
             self._reason = httputil.responses.get(status_code, "Unknown")
 
@@ -617,9 +617,9 @@ class RequestHandler(object):
         See https://docs.python.org/3/library/http.cookies.html#http.cookies.Morsel
         for available attributes.
         """
-        # The cookie library only accepts type str, in both python 2 and 3
-        name = escape.native_str(name)
-        value = escape.native_str(value)
+        # The cookie library only accepts type str
+        if isinstance(value, bytes):
+            value = value.decode("utf-8")
         if re.search(r"[\x00-\x20]", name + value):
             # Don't let us accidentally inject bad stuff
             raise ValueError("Invalid cookie %r: %r" % (name, value))

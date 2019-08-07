@@ -2,7 +2,7 @@ import os
 import traceback
 import unittest
 
-from tornado.escape import utf8, native_str, to_unicode
+from tornado.escape import utf8, to_unicode
 from tornado.template import Template, DictLoader, ParseError, Loader
 from tornado.util import ObjectDict
 
@@ -442,7 +442,7 @@ raw: {% raw name %}""",
 
         def py_escape(s):
             self.assertEqual(type(s), bytes)
-            return repr(native_str(s))
+            return repr(s.decode())
 
         def render(template, name):
             return loader.load(template).generate(py_escape=py_escape, name=name)

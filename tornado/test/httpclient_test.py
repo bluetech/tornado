@@ -14,7 +14,7 @@ import typing  # noqa: F401
 import unicodedata
 import unittest
 
-from tornado.escape import utf8, native_str, to_unicode
+from tornado.escape import utf8, to_unicode
 from tornado import gen
 from tornado.httpclient import (
     HTTPRequest,
@@ -629,7 +629,7 @@ X-XSS-Protection: 1;
         # Non-ascii headers are sent as latin1.
         response = self.fetch("/set_header?k=foo&v=%E9")
         response.rethrow()
-        self.assertEqual(response.headers["Foo"], native_str(u"\u00e9"))
+        self.assertEqual(response.headers["Foo"], "\u00e9")
 
     def test_response_times(self):
         # A few simple sanity checks of the response time fields to

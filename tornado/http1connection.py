@@ -28,7 +28,7 @@ from tornado.concurrent import (
     future_add_done_callback,
     future_set_result_unless_cancelled,
 )
-from tornado.escape import native_str, utf8
+from tornado.escape import utf8
 from tornado import gen
 from tornado import httputil
 from tornado import iostream
@@ -440,12 +440,7 @@ class HTTP1Connection(httputil.HTTPConnection):
             self._expected_content_remaining = int(headers["Content-Length"])
         else:
             self._expected_content_remaining = None
-        # TODO: headers are supposed to be of type str, but we still have some
-        # cases that let bytes slip through. Remove these native_str calls when those
-        # are fixed.
-        header_lines = (
-            native_str(n) + ": " + native_str(v) for n, v in headers.get_all()
-        )
+        header_lines = (n + ": " + v for n, v in headers.get_all())
         lines.extend(l.encode("latin1") for l in header_lines)
         for line in lines:
             if b"\n" in line:
@@ -579,7 +574,7 @@ class HTTP1Connection(httputil.HTTPConnection):
         # insert between messages of a reused connection.  Per RFC 7230,
         # we SHOULD ignore at least one empty line before the request.
         # http://tools.ietf.org/html/rfc7230#section-3.5
-        data_str = native_str(data.decode("latin1")).lstrip("\r\n")
+        data_str = data.decode("latin1").lstrip("\r\n")
         # RFC 7230 section allows for both CRLF and bare LF.
         eol = data_str.find("\n")
         start_line = data_str[:eol].rstrip("\r")

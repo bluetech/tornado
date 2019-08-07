@@ -11,7 +11,7 @@ from tornado.httputil import (
     HTTPInputError,
     HTTPFile,
 )
-from tornado.escape import utf8, native_str
+from tornado.escape import utf8
 from tornado.log import gen_log
 from tornado.testing import ExpectLog
 
@@ -320,15 +320,10 @@ Foo: even
                         # Some chars cannot be represented in latin1
                         continue
                     data = b"Cookie: foo=" + encoded + b"bar"
-                    # parse() wants a native_str, so decode through latin1
+                    # parse() wants an str, so decode through latin1
                     # in the same way the real parser does.
-                    headers = HTTPHeaders.parse(native_str(data.decode("latin1")))
-                    expected = [
-                        (
-                            "Cookie",
-                            "foo=" + native_str(encoded.decode("latin1")) + "bar",
-                        )
-                    ]
+                    headers = HTTPHeaders.parse(data.decode("latin1"))
+                    expected = [("Cookie", "foo=" + encoded.decode("latin1") + "bar")]
                     self.assertEqual(expected, list(headers.get_all()))
                 except Exception:
                     gen_log.warning("failed while trying %r in %s", newline, encoding)
@@ -511,8 +506,7 @@ class ParseCookieTest(unittest.TestCase):
         )
         # Unicode characters. The spec only allows ASCII.
         self.assertEqual(
-            parse_cookie("saint=André Bessette"),
-            {"saint": native_str("André Bessette")},
+            parse_cookie("saint=André Bessette"), {"saint": "André Bessette"}
         )
         # Browsers don't send extra whitespace or semicolons in Cookie headers,
         # but parse_cookie() should parse whitespace the same way

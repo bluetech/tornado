@@ -29,7 +29,7 @@ from urllib.parse import urlparse
 import zlib
 
 from tornado.concurrent import Future, future_set_result_unless_cancelled
-from tornado.escape import utf8, native_str, to_unicode
+from tornado.escape import utf8, to_unicode
 from tornado import gen, httpclient, httputil
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.iostream import StreamClosedError, IOStream
@@ -905,7 +905,7 @@ class WebSocketProtocol13(WebSocketProtocol):
         sha1 = hashlib.sha1()
         sha1.update(utf8(key))
         sha1.update(b"258EAFA5-E914-47DA-95CA-C5AB0DC85B11")  # Magic value
-        return native_str(base64.b64encode(sha1.digest()))
+        return base64.b64encode(sha1.digest()).decode()
 
     def _challenge_response(self, handler: WebSocketHandler) -> str:
         return WebSocketProtocol13.compute_accept_value(

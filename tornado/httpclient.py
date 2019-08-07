@@ -48,7 +48,7 @@ from tornado.concurrent import (
     future_set_result_unless_cancelled,
     future_set_exception_unless_cancelled,
 )
-from tornado.escape import utf8, native_str
+from tornado.escape import utf8
 from tornado import gen, httputil
 from tornado.ioloop import IOLoop
 from tornado.util import Configurable
@@ -780,7 +780,7 @@ def main() -> None:
         if options.print_headers:
             print(response.headers)
         if options.print_body:
-            print(native_str(response.body))
+            print(response.body.decode("utf-8"))
     client.close()
 
 

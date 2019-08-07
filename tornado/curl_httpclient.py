@@ -26,7 +26,7 @@ from io import BytesIO
 from tornado import httputil
 from tornado import ioloop
 
-from tornado.escape import utf8, native_str
+from tornado.escape import utf8
 from tornado.httpclient import (
     HTTPRequest,
     HTTPResponse,
@@ -330,7 +330,7 @@ class CurlAsyncHTTPClient(AsyncHTTPClient):
         buffer: BytesIO,
         headers: httputil.HTTPHeaders,
     ) -> None:
-        curl.setopt(pycurl.URL, native_str(request.url))
+        curl.setopt(pycurl.URL, request.url)
 
         # libcurl's magic "Expect: 100-continue" behavior causes delays
         # with servers that don't support it (which include, among others,
@@ -348,11 +348,7 @@ class CurlAsyncHTTPClient(AsyncHTTPClient):
             request.headers["Pragma"] = ""
 
         curl.setopt(
-            pycurl.HTTPHEADER,
-            [
-                "%s: %s" % (native_str(k), native_str(v))
-                for k, v in request.headers.get_all()
-            ],
+            pycurl.HTTPHEADER, ["%s: %s" % (k, v) for k, v in request.headers.get_all()]
         )
 
         curl.setopt(
@@ -378,7 +374,7 @@ class CurlAsyncHTTPClient(AsyncHTTPClient):
         assert request.request_timeout is not None
         curl.setopt(pycurl.TIMEOUT_MS, int(1000 * request.request_timeout))
         if request.user_agent:
-            curl.setopt(pycurl.USERAGENT, native_str(request.user_agent))
+            curl.setopt(pycurl.USERAGENT, request.user_agent)
         else:
             curl.setopt(pycurl.USERAGENT, "Mozilla/5.0 (compatible; pycurl)")
         if request.network_interface:
@@ -539,7 +535,7 @@ class CurlAsyncHTTPClient(AsyncHTTPClient):
         header_callback: Callable[[str], None],
         header_line_bytes: bytes,
     ) -> None:
-        header_line = native_str(header_line_bytes.decode("latin1"))
+        header_line = header_line_bytes.decode("latin1")
         if header_callback is not None:
             self.io_loop.add_callback(header_callback, header_line)
         # header_line as returned by curl includes the end-of-line characters.
@@ -559,10 +555,8 @@ class CurlAsyncHTTPClient(AsyncHTTPClient):
     def _curl_debug(self, debug_type: int, debug_msg: str) -> None:
         debug_types = ("I", "<", ">", "<", ">")
         if debug_type == 0:
-            debug_msg = native_str(debug_msg)
             curl_log.debug("%s", debug_msg.strip())
         elif debug_type in (1, 2):
-            debug_msg = native_str(debug_msg)
             for line in debug_msg.splitlines():
                 curl_log.debug("%s %s", debug_types[debug_type], line)
         elif debug_type == 4:

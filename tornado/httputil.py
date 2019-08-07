@@ -32,7 +32,7 @@ import time
 import unicodedata
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 
-from tornado.escape import native_str, parse_qs_bytes, utf8
+from tornado.escape import parse_qs_bytes, utf8
 from tornado.log import gen_log
 from tornado.util import ObjectDict
 
@@ -136,9 +136,7 @@ class HTTPHeaders(collections.abc.MutableMapping):
         norm_name = _normalize_header(name)
         self._last_key = norm_name
         if norm_name in self:
-            self._dict[norm_name] = (
-                native_str(self[norm_name]) + "," + native_str(value)
-            )
+            self._dict[norm_name] = self[norm_name] + "," + value
             self._as_list[norm_name].append(value)
         else:
             self[norm_name] = value
@@ -760,7 +758,7 @@ def parse_body_arguments(
             )
             return
         try:
-            uri_arguments = parse_qs_bytes(native_str(body), keep_blank_values=True)
+            uri_arguments = parse_qs_bytes(body.decode("utf-8"), keep_blank_values=True)
         except Exception as e:
             gen_log.warning("Invalid x-www-form-urlencoded body: %s", e)
             uri_arguments = {}
@@ -940,7 +938,6 @@ def parse_response_start_line(line: str) -> ResponseStartLine:
     >>> parse_response_start_line("HTTP/1.1 200 OK")
     ResponseStartLine(version='HTTP/1.1', code=200, reason='OK')
     """
-    line = native_str(line)
     match = _http_response_line_re.match(line)
     if not match:
         raise HTTPInputError("Error parsing response start line")
@@ -991,7 +988,7 @@ def _parse_header(line: str) -> Tuple[str, Dict[str, str]]:
         if i >= 0:
             name = p[:i].strip().lower()
             value = p[i + 1 :].strip()
-            params.append((name, native_str(value)))
+            params.append((name, value))
     decoded_params = email.utils.decode_params(params)
     decoded_params.pop(0)  # get rid of the dummy again
     pdict = {}

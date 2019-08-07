@@ -100,7 +100,7 @@ import sys
 import os
 import textwrap
 
-from tornado.escape import _unicode, native_str
+from tornado.escape import _unicode
 from tornado.log import define_logging_options
 from tornado.util import exec_in
 
@@ -403,7 +403,7 @@ class OptionParser(object):
         """
         config = {"__file__": os.path.abspath(path)}
         with open(path, "rb") as f:
-            exec_in(native_str(f.read()), config, config)
+            exec_in(f.read().decode(), config, config)
         for name in config:
             normalized = self._normalize_name(name)
             if normalized in self._options:

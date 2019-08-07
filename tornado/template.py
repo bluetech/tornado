@@ -285,7 +285,7 @@ class Template(object):
         .. versionchanged:: 4.3
            Added ``whitespace`` parameter; deprecated ``compress_whitespace``.
         """
-        self.name = escape.native_str(name)
+        self.name = name
 
         if compress_whitespace is not _UNSET:
             # Convert deprecated compress_whitespace (bool) to whitespace (str).
@@ -313,7 +313,9 @@ class Template(object):
             self.autoescape = _DEFAULT_AUTOESCAPE
 
         self.namespace = loader.namespace if loader else {}
-        reader = _TemplateReader(name, escape.native_str(template_string), whitespace)
+        if isinstance(template_string, bytes):
+            template_string = template_string.decode()
+        reader = _TemplateReader(name, template_string, whitespace)
         self.file = _File(self, _parse(reader, self))
         self.code = self._generate_python(loader)
         self.loader = loader

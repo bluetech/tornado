@@ -5,7 +5,6 @@ from tornado.escape import (
     utf8,
     to_unicode,
     recursive_unicode,
-    native_str,
     to_basestring,
 )
 from tornado.httpclient import HTTPClientError
@@ -615,7 +614,7 @@ class DecodeArgHandler(RequestHandler):
     def get(self, arg):
         def describe(s):
             if type(s) == bytes:
-                return ["bytes", native_str(binascii.b2a_hex(s))]
+                return ["bytes", binascii.b2a_hex(s).decode()]
             elif type(s) == str:
                 return ["unicode", s]
             raise Exception("unknown type")
@@ -2733,7 +2732,7 @@ class XSRFTest(SimpleHandlerTestCase):
             "/" if version is None else ("/?version=%d" % version), headers=headers
         )
         response.rethrow()
-        return native_str(response.body)
+        return response.body.decode()
 
     def cookie_headers(self, token=None):
         if token is None:
