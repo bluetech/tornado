@@ -390,10 +390,10 @@ class OAuthMixin(object):
         consumer_token = self._oauth_consumer_token()
         url = self._OAUTH_REQUEST_TOKEN_URL  # type: ignore
         args = dict(
-            oauth_consumer_key=escape.to_basestring(consumer_token["key"]),
+            oauth_consumer_key=escape.to_unicode(consumer_token["key"]),
             oauth_signature_method="HMAC-SHA1",
             oauth_timestamp=str(int(time.time())),
-            oauth_nonce=escape.to_basestring(binascii.b2a_hex(uuid.uuid4().bytes)),
+            oauth_nonce=binascii.b2a_hex(uuid.uuid4().bytes).decode(),
             oauth_version="1.0",
         )
         if getattr(self, "_OAUTH_VERSION", "1.0a") == "1.0a":
@@ -440,11 +440,11 @@ class OAuthMixin(object):
         consumer_token = self._oauth_consumer_token()
         url = self._OAUTH_ACCESS_TOKEN_URL  # type: ignore
         args = dict(
-            oauth_consumer_key=escape.to_basestring(consumer_token["key"]),
-            oauth_token=escape.to_basestring(request_token["key"]),
+            oauth_consumer_key=escape.to_unicode(consumer_token["key"]),
+            oauth_token=escape.to_unicode(request_token["key"]),
             oauth_signature_method="HMAC-SHA1",
             oauth_timestamp=str(int(time.time())),
-            oauth_nonce=escape.to_basestring(binascii.b2a_hex(uuid.uuid4().bytes)),
+            oauth_nonce=binascii.b2a_hex(uuid.uuid4().bytes).decode(),
             oauth_version="1.0",
         )
         if "verifier" in request_token:
@@ -507,11 +507,11 @@ class OAuthMixin(object):
         """
         consumer_token = self._oauth_consumer_token()
         base_args = dict(
-            oauth_consumer_key=escape.to_basestring(consumer_token["key"]),
-            oauth_token=escape.to_basestring(access_token["key"]),
+            oauth_consumer_key=escape.to_unicode(consumer_token["key"]),
+            oauth_token=escape.to_unicode(access_token["key"]),
             oauth_signature_method="HMAC-SHA1",
             oauth_timestamp=str(int(time.time())),
-            oauth_nonce=escape.to_basestring(binascii.b2a_hex(uuid.uuid4().bytes)),
+            oauth_nonce=binascii.b2a_hex(uuid.uuid4().bytes).decode(),
             oauth_version="1.0",
         )
         args = {}
@@ -525,7 +525,7 @@ class OAuthMixin(object):
             signature = _oauth_signature(
                 consumer_token, method, url, args, access_token
             )
-        base_args["oauth_signature"] = escape.to_basestring(signature)
+        base_args["oauth_signature"] = signature.decode()
         return base_args
 
     def get_auth_http_client(self) -> httpclient.AsyncHTTPClient:

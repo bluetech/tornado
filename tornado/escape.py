@@ -50,7 +50,7 @@ def xhtml_escape(value: Union[str, bytes]) -> str:
        Added the single quote to the list of escaped characters.
     """
     return _XHTML_ESCAPE_RE.sub(
-        lambda match: _XHTML_ESCAPE_DICT[match.group(0)], to_basestring(value)
+        lambda match: _XHTML_ESCAPE_DICT[match.group(0)], to_unicode(value)
     )
 
 
@@ -78,7 +78,7 @@ def json_decode(value: Union[str, bytes]) -> Any:
 
     Supports both `str` and `bytes` inputs.
     """
-    return json.loads(to_basestring(value))
+    return json.loads(to_unicode(value))
 
 
 def squeeze(value: str) -> str:
@@ -135,11 +135,11 @@ def url_unescape(  # noqa: F811
     if encoding is None:
         if plus:
             # unquote_to_bytes doesn't have a _plus variant
-            value = to_basestring(value).replace("+", " ")
+            value = to_unicode(value).replace("+", " ")
         return urllib.parse.unquote_to_bytes(value)
     else:
         unquote = urllib.parse.unquote_plus if plus else urllib.parse.unquote
-        return unquote(to_basestring(value), encoding=encoding)
+        return unquote(to_unicode(value), encoding=encoding)
 
 
 def parse_qs_bytes(

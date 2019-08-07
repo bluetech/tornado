@@ -1,12 +1,6 @@
 from tornado.concurrent import Future
 from tornado import gen
-from tornado.escape import (
-    json_decode,
-    utf8,
-    to_unicode,
-    recursive_unicode,
-    to_basestring,
-)
+from tornado.escape import json_decode, utf8, to_unicode, recursive_unicode
 from tornado.httpclient import HTTPClientError
 from tornado.httputil import format_timestamp
 from tornado.iostream import IOStream
@@ -151,7 +145,7 @@ class SecureCookieV1Test(unittest.TestCase):
         )
         # tamper with the cookie
         handler._cookies["foo"] = utf8(
-            "1234|5678%s|%s" % (to_basestring(timestamp), to_basestring(sig))
+            "1234|5678%s|%s" % (timestamp.decode(), sig.decode())
         )
         # it gets rejected
         with ExpectLog(gen_log, "Cookie timestamp in future"):

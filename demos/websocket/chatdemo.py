@@ -83,9 +83,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
         logging.info("got message %r", message)
         parsed = tornado.escape.json_decode(message)
         chat = {"id": str(uuid.uuid4()), "body": parsed["body"]}
-        chat["html"] = tornado.escape.to_basestring(
-            self.render_string("message.html", message=chat)
-        )
+        chat["html"] = self.render_string("message.html", message=chat).decode()
 
         ChatSocketHandler.update_cache(chat)
         ChatSocketHandler.send_updates(chat)
