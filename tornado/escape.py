@@ -194,9 +194,6 @@ def utf8(value: Union[None, str, bytes]) -> Optional[bytes]:  # noqa: F811
     return value.encode("utf-8")
 
 
-_TO_UNICODE_TYPES = (str, type(None))
-
-
 @typing.overload
 def to_unicode(value: str) -> str:
     pass
@@ -218,10 +215,10 @@ def to_unicode(value: Union[None, str, bytes]) -> Optional[str]:  # noqa: F811
     If the argument is already a unicode string or None, it is returned
     unchanged.  Otherwise it must be a byte string and is decoded as utf8.
     """
-    if isinstance(value, _TO_UNICODE_TYPES):
+    if value is None or isinstance(value, str):
         return value
     if not isinstance(value, bytes):
-        raise TypeError("Expected bytes, unicode, or None; got %r" % type(value))
+        raise TypeError("Expected bytes, str, or None; got %r" % type(value))
     return value.decode("utf-8")
 
 
