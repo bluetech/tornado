@@ -34,7 +34,7 @@ from urllib.parse import urlencode, urlparse, urlunparse, parse_qsl
 
 from tornado.escape import native_str, parse_qs_bytes, utf8
 from tornado.log import gen_log
-from tornado.util import ObjectDict, unicode_type
+from tornado.util import ObjectDict
 
 
 # responses is unused in this file, but we re-export it to other files.
@@ -1032,9 +1032,9 @@ def encode_username_password(
 
     .. versionadded:: 5.1
     """
-    if isinstance(username, unicode_type):
+    if isinstance(username, str):
         username = unicodedata.normalize("NFC", username)
-    if isinstance(password, unicode_type):
+    if isinstance(password, str):
         password = unicodedata.normalize("NFC", password)
     return utf8(username) + b":" + utf8(password)
 

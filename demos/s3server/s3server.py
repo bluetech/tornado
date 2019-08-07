@@ -41,7 +41,6 @@ from tornado import escape
 from tornado import httpserver
 from tornado import ioloop
 from tornado import web
-from tornado.util import unicode_type
 from tornado.options import options, define
 
 try:
@@ -99,7 +98,7 @@ class BaseRequestHandler(web.RequestHandler):
         self.finish('<?xml version="1.0" encoding="UTF-8"?>\n' + "".join(parts))
 
     def _render_parts(self, value, parts=[]):
-        if isinstance(value, (unicode_type, bytes)):
+        if isinstance(value, (str, bytes)):
             parts.append(escape.xhtml_escape(value))
         elif isinstance(value, (int, long)):
             parts.append(str(value))

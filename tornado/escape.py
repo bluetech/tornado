@@ -24,8 +24,6 @@ import json
 import re
 import urllib.parse
 
-from tornado.util import unicode_type
-
 import typing
 from typing import Union, Any, Optional, Dict, List, Callable
 
@@ -191,12 +189,12 @@ def utf8(value: Union[None, str, bytes]) -> Optional[bytes]:  # noqa: F811
     """
     if isinstance(value, _UTF8_TYPES):
         return value
-    if not isinstance(value, unicode_type):
-        raise TypeError("Expected bytes, unicode, or None; got %r" % type(value))
+    if not isinstance(value, str):
+        raise TypeError("Expected bytes, str, or None; got %r" % type(value))
     return value.encode("utf-8")
 
 
-_TO_UNICODE_TYPES = (unicode_type, type(None))
+_TO_UNICODE_TYPES = (str, type(None))
 
 
 @typing.overload

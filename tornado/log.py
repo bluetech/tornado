@@ -32,7 +32,6 @@ import logging.handlers
 import sys
 
 from tornado.escape import _unicode
-from tornado.util import unicode_type, basestring_type
 
 try:
     import colorama  # type: ignore
@@ -148,10 +147,8 @@ class LogFormatter(logging.Formatter):
                     # Convert the terminal control characters from
                     # bytes to unicode strings for easier use with the
                     # logging module.
-                    self._colors[levelno] = unicode_type(
-                        curses.tparm(fg_color, code), "ascii"
-                    )
-                self._normal = unicode_type(curses.tigetstr("sgr0"), "ascii")
+                    self._colors[levelno] = str(curses.tparm(fg_color, code), "ascii")
+                self._normal = str(curses.tigetstr("sgr0"), "ascii")
             else:
                 # If curses is not present (currently we'll only get here for
                 # colorama on windows), assume hard-coded ANSI color codes.
@@ -164,7 +161,7 @@ class LogFormatter(logging.Formatter):
     def format(self, record: Any) -> str:
         try:
             message = record.getMessage()
-            assert isinstance(message, basestring_type)  # guaranteed by logging
+            assert isinstance(message, str)  # guaranteed by logging
             # Encoding notes:  The logging module prefers to work with character
             # strings, but only enforces that log messages are instances of
             # basestring.  In python 2, non-ascii bytestrings will make

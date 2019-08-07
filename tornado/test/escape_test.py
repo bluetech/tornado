@@ -13,7 +13,6 @@ from tornado.escape import (
     squeeze,
     recursive_unicode,
 )
-from tornado.util import unicode_type
 
 from typing import List, Tuple, Union, Dict, Any  # noqa: F401
 
@@ -283,7 +282,7 @@ class EscapeTestCase(unittest.TestCase):
         # On python2 the escape methods should generally return the same
         # type as their argument
         self.assertEqual(type(xhtml_escape("foo")), str)
-        self.assertEqual(type(xhtml_escape(u"foo")), unicode_type)
+        self.assertEqual(type(xhtml_escape(u"foo")), str)
 
     def test_json_decode(self):
         # json_decode accepts both bytes and unicode, but strings it returns

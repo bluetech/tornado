@@ -40,7 +40,7 @@ if typing.TYPE_CHECKING:
     import unittest  # noqa: F401
 
 # Aliases for types that are spelled differently in different Python
-# versions. bytes_type is deprecated and no longer used in Tornado
+# versions. These are deprecated and no longer used in Tornado
 # itself but is left in case anyone outside Tornado is using it.
 bytes_type = bytes
 unicode_type = str

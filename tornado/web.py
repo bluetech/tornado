@@ -102,7 +102,7 @@ from tornado.routing import (
     URLSpec,
     _RuleList,
 )
-from tornado.util import ObjectDict, unicode_type, _websocket_mask
+from tornado.util import ObjectDict, _websocket_mask
 
 url = URLSpec
 
@@ -130,7 +130,7 @@ if typing.TYPE_CHECKING:
 
 # The following types are accepted by RequestHandler.set_header
 # and related methods.
-_HeaderTypes = Union[bytes, unicode_type, int, numbers.Integral, datetime.datetime]
+_HeaderTypes = Union[bytes, str, int, numbers.Integral, datetime.datetime]
 
 _CookieSecretTypes = Union[str, bytes, Dict[int, str], Dict[int, bytes]]
 
@@ -403,7 +403,7 @@ class RequestHandler(object):
             # Non-ascii characters in headers are not well supported,
             # but if you pass bytes, use latin1 so they pass through as-is.
             retval = value.decode("latin1")
-        elif isinstance(value, unicode_type):  # py2
+        elif isinstance(value, str):  # py2
             # TODO: This is inconsistent with the use of latin1 above,
             # but it's been that way for a long time. Should it change?
             retval = escape.utf8(value)
@@ -545,7 +545,7 @@ class RequestHandler(object):
         values = []
         for v in source.get(name, []):
             s = self.decode_argument(v, name=name)
-            if isinstance(s, unicode_type):
+            if isinstance(s, str):
                 # Get rid of any weird control chars (unless decoding gave
                 # us bytes, in which case leave it alone)
                 s = RequestHandler._remove_control_chars_regex.sub(" ", s)
@@ -829,7 +829,7 @@ class RequestHandler(object):
         """
         if self._finished:
             raise RuntimeError("Cannot write() after finish()")
-        if not isinstance(chunk, (bytes, unicode_type, dict)):
+        if not isinstance(chunk, (bytes, str, dict)):
             message = "write() only accepts bytes, unicode, and dict objects"
             if isinstance(chunk, list):
                 message += (
@@ -873,7 +873,7 @@ class RequestHandler(object):
                 js_embed.append(utf8(embed_part))
             file_part = module.javascript_files()
             if file_part:
-                if isinstance(file_part, (unicode_type, bytes)):
+                if isinstance(file_part, (str, bytes)):
                     js_files.append(_unicode(file_part))
                 else:
                     js_files.extend(file_part)
@@ -882,7 +882,7 @@ class RequestHandler(object):
                 css_embed.append(utf8(embed_part))
             file_part = module.css_files()
             if file_part:
-                if isinstance(file_part, (unicode_type, bytes)):
+                if isinstance(file_part, (str, bytes)):
                     css_files.append(_unicode(file_part))
                 else:
                     css_files.extend(file_part)
@@ -3306,7 +3306,7 @@ class TemplateModule(UIModule):
     def javascript_files(self) -> Iterable[str]:
         result = []
         for f in self._get_resources("javascript_files"):
-            if isinstance(f, (unicode_type, bytes)):
+            if isinstance(f, (str, bytes)):
                 result.append(f)
             else:
                 result.extend(f)
@@ -3318,7 +3318,7 @@ class TemplateModule(UIModule):
     def css_files(self) -> Iterable[str]:
         result = []
         for f in self._get_resources("css_files"):
-            if isinstance(f, (unicode_type, bytes)):
+            if isinstance(f, (str, bytes)):
                 result.append(f)
             else:
                 result.extend(f)

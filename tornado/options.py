@@ -102,7 +102,7 @@ import textwrap
 
 from tornado.escape import _unicode, native_str
 from tornado.log import define_logging_options
-from tornado.util import basestring_type, exec_in
+from tornado.util import exec_in
 
 from typing import (
     Any,
@@ -556,7 +556,7 @@ class _Option(object):
             datetime.datetime: self._parse_datetime,
             datetime.timedelta: self._parse_timedelta,
             bool: self._parse_bool,
-            basestring_type: self._parse_string,
+            str: self._parse_string,
         }.get(
             self.type, self.type
         )  # type: Callable[[str], Any]

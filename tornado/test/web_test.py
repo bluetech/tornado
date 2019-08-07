@@ -17,7 +17,7 @@ from tornado.log import app_log, gen_log
 from tornado.simple_httpclient import SimpleAsyncHTTPClient
 from tornado.template import DictLoader
 from tornado.testing import AsyncHTTPTestCase, AsyncTestCase, ExpectLog, gen_test
-from tornado.util import ObjectDict, unicode_type
+from tornado.util import ObjectDict
 from tornado.web import (
     Application,
     RequestHandler,
@@ -496,10 +496,10 @@ class EchoHandler(RequestHandler):
                 if type(value) != bytes:
                     raise Exception("incorrect type for value: %r" % type(value))
             for value in self.get_arguments(key):
-                if type(value) != unicode_type:
+                if type(value) != str:
                     raise Exception("incorrect type for value: %r" % type(value))
         for arg in path_args:
-            if type(arg) != unicode_type:
+            if type(arg) != str:
                 raise Exception("incorrect type for path arg: %r" % type(arg))
         self.write(
             dict(
@@ -566,7 +566,7 @@ class TypeCheckHandler(RequestHandler):
 
         # get_argument is an exception from the general rule of using
         # type str for non-body data mainly for historical reasons.
-        self.check_type("argument", self.get_argument("foo"), unicode_type)
+        self.check_type("argument", self.get_argument("foo"), str)
         self.check_type("cookie_key", list(self.cookies.keys())[0], str)
         self.check_type("cookie_value", list(self.cookies.values())[0].value, str)
 
@@ -589,11 +589,11 @@ class TypeCheckHandler(RequestHandler):
     def get(self, path_component):
         # path_component uses type unicode instead of str for consistency
         # with get_argument()
-        self.check_type("path_component", path_component, unicode_type)
+        self.check_type("path_component", path_component, str)
         self.write(self.errors)
 
     def post(self, path_component):
-        self.check_type("path_component", path_component, unicode_type)
+        self.check_type("path_component", path_component, str)
         self.write(self.errors)
 
     def check_type(self, name, obj, expected_type):
@@ -616,7 +616,7 @@ class DecodeArgHandler(RequestHandler):
         def describe(s):
             if type(s) == bytes:
                 return ["bytes", native_str(binascii.b2a_hex(s))]
-            elif type(s) == unicode_type:
+            elif type(s) == str:
                 return ["unicode", s]
             raise Exception("unknown type")
 

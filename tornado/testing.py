@@ -29,7 +29,7 @@ from tornado import netutil
 from tornado.platform.asyncio import AsyncIOMainLoop
 from tornado.process import Subprocess
 from tornado.log import app_log
-from tornado.util import raise_exc_info, basestring_type
+from tornado.util import raise_exc_info
 from tornado.web import Application
 
 import typing
@@ -653,10 +653,7 @@ class ExpectLog(logging.Filter):
     """
 
     def __init__(
-        self,
-        logger: Union[logging.Logger, basestring_type],
-        regex: str,
-        required: bool = True,
+        self, logger: Union[logging.Logger, str], regex: str, required: bool = True
     ) -> None:
         """Constructs an ExpectLog context manager.
 
@@ -667,7 +664,7 @@ class ExpectLog(logging.Filter):
         :param required: If true, an exception will be raised if the end of
             the ``with`` statement is reached without matching any log entries.
         """
-        if isinstance(logger, basestring_type):
+        if isinstance(logger, str):
             logger = logging.getLogger(logger)
         self.logger = logger
         self.regex = re.compile(regex)

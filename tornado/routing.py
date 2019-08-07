@@ -182,7 +182,7 @@ from tornado import httputil
 from tornado.httpserver import _CallableAdapter
 from tornado.escape import url_escape, url_unescape, utf8
 from tornado.log import app_log
-from tornado.util import basestring_type, import_object, re_unescape, unicode_type
+from tornado.util import import_object, re_unescape
 
 from typing import Any, Union, Optional, Awaitable, List, Dict, Pattern, Tuple, overload
 
@@ -340,7 +340,7 @@ class RuleRouter(Router):
         for rule in rules:
             if isinstance(rule, (tuple, list)):
                 assert len(rule) in (2, 3, 4)
-                if isinstance(rule[0], basestring_type):
+                if isinstance(rule[0], str):
                     rule = Rule(PathMatches(rule[0]), *rule[1:])
                 else:
                     rule = Rule(*rule)
@@ -518,7 +518,7 @@ class HostMatches(Matcher):
     """Matches requests from hosts specified by ``host_pattern`` regex."""
 
     def __init__(self, host_pattern: Union[str, Pattern]) -> None:
-        if isinstance(host_pattern, basestring_type):
+        if isinstance(host_pattern, str):
             if not host_pattern.endswith("$"):
                 host_pattern += "$"
             self.host_pattern = re.compile(host_pattern)
@@ -553,7 +553,7 @@ class PathMatches(Matcher):
     """Matches requests with paths specified by ``path_pattern`` regex."""
 
     def __init__(self, path_pattern: Union[str, Pattern]) -> None:
-        if isinstance(path_pattern, basestring_type):
+        if isinstance(path_pattern, str):
             if not path_pattern.endswith("$"):
                 path_pattern += "$"
             self.regex = re.compile(path_pattern)
@@ -600,7 +600,7 @@ class PathMatches(Matcher):
             return self._path
         converted_args = []
         for a in args:
-            if not isinstance(a, (unicode_type, bytes)):
+            if not isinstance(a, (str, bytes)):
                 a = str(a)
             converted_args.append(url_escape(utf8(a), plus=False))
         return self._path % tuple(converted_args)

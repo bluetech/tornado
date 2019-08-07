@@ -205,7 +205,7 @@ import threading
 
 from tornado import escape
 from tornado.log import app_log
-from tornado.util import ObjectDict, exec_in, unicode_type
+from tornado.util import ObjectDict, exec_in
 
 from typing import Any, Union, Callable, List, Dict, Iterable, Optional, TextIO
 import typing
@@ -344,7 +344,7 @@ class Template(object):
             "linkify": escape.linkify,
             "datetime": datetime,
             "_tt_utf8": escape.utf8,  # for internal use
-            "_tt_string_types": (unicode_type, bytes),
+            "_tt_string_types": (str, bytes),
             # __name__ and __loader__ allow the traceback mechanism to find
             # the generated source code.
             "__name__": self.name.replace(".", "_"),

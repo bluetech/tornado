@@ -300,7 +300,7 @@ Foo: even
         # Characters that are likely to be problematic can be found in
         # http://unicode.org/standard/reports/tr13/tr13-5.html
         # and cpython's unicodeobject.c (which defines the implementation
-        # of unicode_type.splitlines(), and uses a different list than TR13).
+        # of str.splitlines(), and uses a different list than TR13).
         newlines = [
             u"\u001b",  # VERTICAL TAB
             u"\u001c",  # FILE SEPARATOR

@@ -7,7 +7,6 @@ from unittest import mock
 import unittest
 
 from tornado.options import OptionParser, Error
-from tornado.util import basestring_type
 from tornado.test.util import subTest
 
 import typing
@@ -198,7 +197,6 @@ class OptionsTest(unittest.TestCase):
     def _define_options(self):
         options = OptionParser()
         options.define("str", type=str)
-        options.define("basestring", type=basestring_type)
         options.define("int", type=int)
         options.define("float", type=float)
         options.define("datetime", type=datetime.datetime)
@@ -209,7 +207,6 @@ class OptionsTest(unittest.TestCase):
 
     def _check_options_values(self, options):
         self.assertEqual(options.str, "asdf")
-        self.assertEqual(options.basestring, "qwer")
         self.assertEqual(options.int, 42)
         self.assertEqual(options.float, 1.5)
         self.assertEqual(options.datetime, datetime.datetime(2013, 4, 28, 5, 16))
@@ -224,7 +221,6 @@ class OptionsTest(unittest.TestCase):
             [
                 "main.py",
                 "--str=asdf",
-                "--basestring=qwer",
                 "--int=42",
                 "--float=1.5",
                 "--datetime=2013-04-28 05:16",
